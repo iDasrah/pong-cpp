@@ -3,6 +3,9 @@
 
 using namespace std;
 
+int playerScore = 0;
+int cpuScore = 0;
+
 class Ball {
     public:
         float x, y;
@@ -10,7 +13,9 @@ class Ball {
         int radius;
 
         Ball(float startX, float startY, int startSpeedX, int startSpeedY, int ballRadius) 
-            : x(startX), y(startY), speedX(startSpeedX), speedY(startSpeedY), radius(ballRadius) {}
+            : x(startX), y(startY), speedX(startSpeedX), speedY(startSpeedY), radius(ballRadius) {
+                RandomizeDirection();
+            }
 
         void Draw() {
             DrawCircle(x, y, radius, WHITE);
@@ -25,9 +30,29 @@ class Ball {
                 speedY = -speedY;
             }
 
-            if (x + radius > GetScreenWidth() || x - radius <= 0) {
-                speedX = -speedX;
+            if (x + radius > GetScreenWidth()) {
+                playerScore++;
+                Reset();
+            } 
+            
+            if(x - radius <= 0) {
+                cpuScore++;
+                Reset();
             }
+        }
+
+    private:
+        void Reset() {
+            x = GetScreenWidth() / 2;
+            y = GetScreenHeight() / 2;
+
+            RandomizeDirection();
+        }
+
+        void RandomizeDirection() {
+            int speedChoices[2] = {1, -1};
+            speedX *= speedChoices[GetRandomValue(0, 1)];
+            speedY *= speedChoices[GetRandomValue(0, 1)];
         }
 };
 
@@ -93,7 +118,7 @@ int main () {
     InitWindow(width, height, "Pong");
     SetTargetFPS(60);
 
-    Ball ball(width / 2, height / 2, 5, 5, 10);
+    Ball ball(width / 2, height / 2, 5, 6, 10);
     Paddle playerPaddle(10, height / 2 - 50, 10, 100);
     CPUPaddle cpuPaddle(width - 20, height / 2 - 50, 10, 100);
 
@@ -123,6 +148,10 @@ int main () {
 
         playerPaddle.Draw();
         cpuPaddle.Draw();
+
+        // draw scores
+        DrawText(TextFormat("Player: %d", playerScore), 10, 10, 20, WHITE);
+        DrawText(TextFormat("CPU: %d", cpuScore), width - 100, 10, 20, WHITE);
 
         EndDrawing();
     }
