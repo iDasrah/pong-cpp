@@ -11,6 +11,13 @@ class Ball {
                 RandomizeDirection();
             }
 
+        void Reset() {
+            x = GetScreenWidth() / 2;
+            y = GetScreenHeight() / 2;
+
+            RandomizeDirection();
+        }
+
         void Draw() {
             DrawCircle(x, y, radius, WHITE);
         }
@@ -36,13 +43,6 @@ class Ball {
         }
 
     private:
-        void Reset() {
-            x = GetScreenWidth() / 2;
-            y = GetScreenHeight() / 2;
-
-            RandomizeDirection();
-        }
-
         void RandomizeDirection() {
             int speedChoices[2] = {1, -1};
             speedX *= speedChoices[GetRandomValue(0, 1)];
