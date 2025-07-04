@@ -101,6 +101,15 @@ int main () {
     {
         BeginDrawing();
 
+        // collision check
+        if (CheckCollisionCircleRec(Vector2{ball.x, ball.y}, ball.radius, Rectangle{playerPaddle.x, playerPaddle.y, playerPaddle.width, playerPaddle.height})) {
+            ball.speedX = -ball.speedX;
+        }
+
+        if (CheckCollisionCircleRec(Vector2{ball.x, ball.y}, ball.radius, Rectangle{cpuPaddle.x, cpuPaddle.y, cpuPaddle.width, cpuPaddle.height})) {
+            ball.speedX = -ball.speedX;
+        }
+
         // update
         ball.Update();
         playerPaddle.Update();
