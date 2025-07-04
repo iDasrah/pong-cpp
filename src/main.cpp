@@ -1,126 +1,26 @@
-#include <iostream>
 #include <raylib.h>
 
+#include "Ball.h"
+#include "Paddle.h"
+#include "CPUPaddle.h"
+
 using namespace std;
+
+const int width = 1280;
+const int height = 720;
 
 int playerScore = 0;
 int cpuScore = 0;
 
-class Ball {
-    public:
-        float x, y;
-        int speedX, speedY;
-        int radius;
-
-        Ball(float startX, float startY, int startSpeedX, int startSpeedY, int ballRadius) 
-            : x(startX), y(startY), speedX(startSpeedX), speedY(startSpeedY), radius(ballRadius) {
-                RandomizeDirection();
-            }
-
-        void Draw() {
-            DrawCircle(x, y, radius, WHITE);
-        }
-
-        void Update() {
-            x += speedX;
-            y += speedY;
-
-            // check for collision with walls
-            if (y + radius > GetScreenHeight() || y - radius <= 0) {
-                speedY = -speedY;
-            }
-
-            if (x + radius > GetScreenWidth()) {
-                playerScore++;
-                Reset();
-            } 
-            
-            if(x - radius <= 0) {
-                cpuScore++;
-                Reset();
-            }
-        }
-
-    private:
-        void Reset() {
-            x = GetScreenWidth() / 2;
-            y = GetScreenHeight() / 2;
-
-            RandomizeDirection();
-        }
-
-        void RandomizeDirection() {
-            int speedChoices[2] = {1, -1};
-            speedX *= speedChoices[GetRandomValue(0, 1)];
-            speedY *= speedChoices[GetRandomValue(0, 1)];
-        }
-};
-
-class Paddle {
-    public:
-        float x, y;
-        float width, height;
-        int speed;
-
-        Paddle(float startX = 10, float startY = 0, float paddleWidth = 10, float paddleHeight = 100, int paddleSpeed = 5) 
-            : x(startX), y(startY), width(paddleWidth), height(paddleHeight), speed(paddleSpeed) {}
-
-        void Draw() {
-            DrawRectangle(x, y, width, height, WHITE);
-        }
-
-        void Update() {
-            if (IsKeyDown(KEY_W) || IsKeyDown(KEY_UP)) {
-                y -= speed;
-            }
-
-            if (IsKeyDown(KEY_S) || IsKeyDown(KEY_DOWN)) {
-                y += speed;
-            }
-
-            KeepPaddleInBounds();
-        }
-
-        protected:
-            void KeepPaddleInBounds() {
-                if (y < 0) {
-                    y = 0;
-                }
-                if (y + height > GetScreenHeight()) {
-                    y = GetScreenHeight() - height;
-                }
-            }
-};
-
-class CPUPaddle : public Paddle {
-    public:
-        CPUPaddle(float startX = 10, float startY = 0, float paddleWidth = 10, float paddleHeight = 100, int paddleSpeed = 5) 
-            : Paddle(startX, startY, paddleWidth, paddleHeight, paddleSpeed) {}
-
-        void Update(int ballY) {
-            if (y + height / 2 > ballY) {
-                y -= speed;
-            } else if (y + height / 2 <= ballY) {
-                y += speed;
-            }
-
-            KeepPaddleInBounds();
-        }
-};
+Ball ball(width / 2, height / 2, 5, 6, 10);
+Paddle playerPaddle(10, height / 2 - 50, 10, 100);
+CPUPaddle cpuPaddle(width - 20, height / 2 - 50, 10, 100);
 
 int main () {
-    const int width = 1280;
-    const int height = 720;
-
-    cout << "Starting the game..." << endl;
 
     SetConfigFlags(FLAG_WINDOW_HIGHDPI);
     InitWindow(width, height, "Pong");
     SetTargetFPS(60);
-
-    Ball ball(width / 2, height / 2, 5, 6, 10);
-    Paddle playerPaddle(10, height / 2 - 50, 10, 100);
-    CPUPaddle cpuPaddle(width - 20, height / 2 - 50, 10, 100);
 
     while (!WindowShouldClose())
     {
@@ -136,7 +36,7 @@ int main () {
         }
 
         // update
-        ball.Update();
+        ball.Update(playerScore, cpuScore);
         playerPaddle.Update();
         cpuPaddle.Update(ball.y);
 
@@ -156,6 +56,5 @@ int main () {
         EndDrawing();
     }
     
-
     CloseWindow();
 }
