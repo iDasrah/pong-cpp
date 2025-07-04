@@ -5,7 +5,7 @@ using namespace std;
 
 class Ball {
     public:
-        float x, y; // position
+        float x, y;
         int speedX, speedY;
         int radius;
 
@@ -19,6 +19,15 @@ class Ball {
         void Update() {
             x += speedX;
             y += speedY;
+
+            // check for collision with walls
+            if (y + radius > GetScreenHeight() || y - radius <= 0) {
+                speedY = -speedY;
+            }
+
+            if (x + radius > GetScreenWidth() || x - radius <= 0) {
+                speedX = -speedX;
+            }
         }
 };
 
