@@ -45,7 +45,7 @@ class Paddle {
         }
 
         void Update() {
-            if (IsKeyDown(KEY_Z) || IsKeyDown(KEY_UP)) {
+            if (IsKeyDown(KEY_W) || IsKeyDown(KEY_UP)) {
                 y -= speed;
             }
 
@@ -53,14 +53,33 @@ class Paddle {
                 y += speed;
             }
 
-            // keep paddle inside the screen
-            if (y <= 0) {
-                y = 0;
+            KeepPaddleInBounds();
+        }
+
+        protected:
+            void KeepPaddleInBounds() {
+                if (y < 0) {
+                    y = 0;
+                }
+                if (y + height > GetScreenHeight()) {
+                    y = GetScreenHeight() - height;
+                }
+            }
+};
+
+class CPUPaddle : public Paddle {
+    public:
+        CPUPaddle(float startX = 10, float startY = 0, float paddleWidth = 10, float paddleHeight = 100, int paddleSpeed = 5) 
+            : Paddle(startX, startY, paddleWidth, paddleHeight, paddleSpeed) {}
+
+        void Update(int ballY) {
+            if (y + height / 2 > ballY) {
+                y -= speed;
+            } else if (y + height / 2 <= ballY) {
+                y += speed;
             }
 
-            if (y + height >= GetScreenHeight()) {
-                y = GetScreenHeight() - height;
-            }
+            KeepPaddleInBounds();
         }
 };
 
@@ -76,7 +95,7 @@ int main () {
 
     Ball ball(width / 2, height / 2, 5, 5, 10);
     Paddle playerPaddle(10, height / 2 - 50, 10, 100);
-    Paddle rightPaddle(width - 20, height / 2 - 50, 10, 100);
+    CPUPaddle cpuPaddle(width - 20, height / 2 - 50, 10, 100);
 
     while (!WindowShouldClose())
     {
@@ -85,13 +104,16 @@ int main () {
         // update
         ball.Update();
         playerPaddle.Update();
+        cpuPaddle.Update(ball.y);
 
         // drawing
         ClearBackground(BLACK);
         DrawLine(width / 2, 0, width / 2, height, WHITE); // drawing center line
-        ball.Draw(); // drawing the ball
-        playerPaddle.Draw(); // drawing the left paddle
-        rightPaddle.Draw(); // drawing the right paddle
+
+        ball.Draw();
+
+        playerPaddle.Draw();
+        cpuPaddle.Draw();
 
         EndDrawing();
     }
