@@ -4,8 +4,6 @@
 #include "Paddle.h"
 #include "CPUPaddle.h"
 
-using namespace std;
-
 const int width = 1280;
 const int height = 720;
 
